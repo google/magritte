@@ -1,0 +1,140 @@
+#
+# Copyright 2020-2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "FaceStickerRedactionSubgraphGpu"
+
+# A subgraph that redacts faces with a custom "sticker" image.
+#
+# The sticker is positioned and zoomed so that it covers the bounding box of
+# each detected face. A default extra zoom can be applied via an input side
+# packet, e.g. if the sticker has a transparent border.
+#
+# Inputs:
+# - IMAGE: The GpuBuffer stream containing the image to be redacted.
+# - DETECTIONS: A list of face detections as std::vector<mediapipe::Detection>.
+#
+# Input side packets:
+# - STICKER_PATH: The path for the sticker image file. If not provided, defaults
+#   to [emoji.png](https://github.com/google/magritte/blob/master/magritte/test_data/emoji.png).
+# - STICKER_ZOOM: The default extra sticker zoom as a float. If not provided,
+#   the default value is 1.
+#
+# Outputs:
+# - IMAGE: A GpuBuffer stream containing the redacted image.
+
+input_stream: "IMAGE:input_video"
+input_stream: "DETECTIONS:detections"
+input_side_packet: "STICKER_PATH:input_sticker_path"
+input_side_packet: "STICKER_ZOOM:input_sticker_zoom"
+output_stream: "IMAGE:output_video"
+
+# Sets a default value for sticker_path so it can be optional.
+node {
+  calculator: "ConstantSidePacketCalculator"
+  output_side_packet: "PACKET:default_sticker_path"
+  node_options: {
+    [type.googleapis.com/mediapipe.ConstantSidePacketCalculatorOptions]: {
+        packet { string_value: "emoji.png" }
+    }
+  }
+}
+
+node {
+  calculator: "DefaultSidePacketCalculator"
+  input_side_packet: "OPTIONAL_VALUE:input_sticker_path"
+  input_side_packet: "DEFAULT_VALUE:default_sticker_path"
+  output_side_packet: "VALUE:sticker_path"
+}
+
+# Opens the image in the path given by sticker_path, and converts it to a
+# GpuBuffer side packet.
+node {
+  calculator: "LocalFileContentsCalculator"
+  input_side_packet: "FILE_PATH:sticker_path"
+  output_side_packet: "CONTENTS:sticker_string"
+}
+
+node {
+  calculator: "SidePacketToStreamCalculator"
+  input_side_packet: "sticker_string"
+  output_stream: "AT_ZERO:sticker_string_stream"
+}
+
+node {
+  calculator: "OpenCvEncodedImageToImageFrameCalculator"
+  input_stream: "sticker_string_stream"
+  output_stream: "sticker_image_stream"
+}
+
+node {
+  calculator: "ImageFrameToGpuBufferCalculator"
+  input_stream: "sticker_image_stream"
+  output_stream: "sticker_image_gpu_stream"
+}
+
+node {
+  calculator: "StreamToSidePacketCalculator"
+  input_stream: "sticker_image_gpu_stream"
+  output_side_packet: "sticker_image"
+}
+
+# Sets a default value for sticker_zoom so it can be optional.
+node {
+  calculator: "ConstantSidePacketCalculator"
+  output_side_packet: "PACKET:default_sticker_zoom"
+  node_options: {
+    [type.googleapis.com/mediapipe.ConstantSidePacketCalculatorOptions]: {
+      packet { float_value: 1.0 }
+    }
+  }
+}
+
+node {
+  calculator: "DefaultSidePacketCalculator"
+  input_side_packet: "OPTIONAL_VALUE:input_sticker_zoom"
+  input_side_packet: "DEFAULT_VALUE:default_sticker_zoom"
+  output_side_packet: "VALUE:sticker_zoom"
+}
+
+# Extracts image size from the input images.
+node {
+  calculator: "ImagePropertiesCalculator"
+  input_stream: "IMAGE_GPU:input_video"
+  output_stream: "SIZE:image_size"
+}
+
+node {
+  calculator: "FaceDetectionToNormalizedRectSubgraph"
+  input_stream: "SIZE:image_size"
+  input_stream: "DETECTIONS:detections"
+  output_stream: "NORM_RECTS:rois"
+}
+
+node {
+  calculator: "RoisToSpriteListCalculator"
+  input_stream: "SIZE:image_size"
+  input_stream: "NORM_RECTS:rois"
+  input_side_packet: "STICKER_IMAGE_GPU:sticker_image"
+  input_side_packet: "STICKER_ZOOM:sticker_zoom"
+  output_stream: "SPRITES:sprites"
+}
+
+node {
+  calculator: "SpriteCalculatorGpu"
+  input_stream: "IMAGE:input_video"
+  input_stream: "SPRITES:sprites"
+  output_stream: "IMAGE:output_video"
+}

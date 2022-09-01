@@ -1,0 +1,49 @@
+#
+# Copyright 2020-2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "MaskPixelizationSubgraphCpu"
+
+# Subgraph to pixelize a certain area of an image. The mask specifies which area
+# is to be pixelized: the parts where the mask is black will contain the
+# original image, the parts where the mask is white will contain the pixelized
+# image, and for values in-between blending will be used.
+#
+# Inputs:
+# - IMAGE: An ImageFrame containing the image to be pixelized.
+# - MASK: An ImageFrame, containing a mask in ImageFormat::VEC32F1 format. It
+#   doesn't need to have the same resolution as the input image, if it has a
+#   different resolution it will be scaled using cv::INTER_NEAREST
+#   interpolation.
+#
+# Outputs:
+# - IMAGE: An ImageFrame containing the resulting image.
+input_stream: "IMAGE:input_video"
+input_stream: "MASK:mask"
+output_stream: "IMAGE:output_video"
+
+node {
+  calculator: "PixelizationCalculatorCpu"
+  input_stream: "FRAMES:input_video"
+  output_stream: "FRAMES:pixelized_video"
+}
+
+node {
+  calculator: "BlendCalculator"
+  input_stream: "FRAMES_BG:input_video"
+  input_stream: "FRAMES_FG:pixelized_video"
+  input_stream: "MASK:mask"
+  output_stream: "FRAMES:output_video"
+}

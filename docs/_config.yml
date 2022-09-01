@@ -1,0 +1,25 @@
+# Configuration for GitHub Pages
+
+remote_theme: pmarsceill/just-the-docs
+
+
+# logo: "image/logo.png"  TODO Replace by a proper logo, 713x172px
+
+# Enable or disable the site search
+search_enabled: true
+
+# Set the search token separator for hyphenated-word search:
+search_tokenizer_separator: /[\s/]+/
+
+# Enable or disable heading anchors
+heading_anchors: true
+
+# Aux links for the upper right navigation
+aux_links:
+  "Magritte on GitHub":
+    - "//github.com/google/magritte"
+
+# Footer content appears at the bottom of every page's main content
+footer_content: "&copy; 2022 GOOGLE LLC | <a href=\"https://policies.google.com/privacy\">PRIVACY POLICY</a> | <a href=\"https://policies.google.com/terms\">TERMS OF SERVICE</a>"
+
+repository: google/magritte

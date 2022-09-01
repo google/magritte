@@ -1,0 +1,39 @@
+//
+// Copyright 2020-2022 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+syntax = "proto2";
+
+package magritte;
+
+import "mediapipe/framework/calculator.proto";
+import "mediapipe/util/color.proto";
+
+message NewCanvasCalculatorOptions {
+  extend mediapipe.CalculatorOptions {
+    optional NewCanvasCalculatorOptions ext = 342007534;
+  }
+
+  optional mediapipe.Color color = 1;
+
+  // Scaling options. Either scale_factor or at least one of target_width and
+  // target_height must be given.
+  // If scale_factor is given, it takes precedence over the other arguments.
+  optional float scale_factor = 2;
+  // If both target_width and target_height are given, those values are used for
+  // the new canvas size. If only one of them is given, then the other one is
+  // calculated in such a way that the aspect ratio is preserved.
+  optional int32 target_width = 3;
+  optional int32 target_height = 4;
+}

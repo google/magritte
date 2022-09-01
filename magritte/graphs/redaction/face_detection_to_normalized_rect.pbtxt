@@ -1,0 +1,55 @@
+#
+# Copyright 2020-2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "FaceDetectionToNormalizedRectSubgraph"
+
+input_stream: "SIZE:image_size"
+input_stream: "DETECTIONS:output_detections"
+output_stream: "NORM_RECTS:output_rects"
+
+# Converts results of face detection into a rectangle (normalized by image size)
+# that encloses the face and is rotated such that the line connecting left eye
+# to right eye is aligned with the X-axis of the rectangle.
+node {
+  calculator: "DetectionsToRectsCalculator"
+  input_stream: "DETECTIONS:output_detections"
+  input_stream: "IMAGE_SIZE:image_size"
+  output_stream: "NORM_RECTS:face_rect"
+  node_options: {
+    [type.googleapis.com/mediapipe.DetectionsToRectsCalculatorOptions] {
+      rotation_vector_start_keypoint_index: 0  # Left eye.
+      rotation_vector_end_keypoint_index: 1  # Right eye.
+      rotation_vector_target_angle_degrees: 0  # X-axis
+      output_zero_rect_for_empty_detections: true
+    }
+  }
+}
+
+# Expands and shifts the rectangle that contains the face so that it's likely
+# to cover the entire face.
+node {
+  calculator: "RectTransformationCalculator"
+  input_stream: "NORM_RECTS:face_rect"
+  input_stream: "IMAGE_SIZE:image_size"
+  output_stream: "output_rects"
+  node_options: {
+    [type.googleapis.com/mediapipe.RectTransformationCalculatorOptions] {
+      scale_x: 1.5
+      scale_y: 2.0
+      square_long: true
+    }
+  }
+}

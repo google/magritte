@@ -1,0 +1,3 @@
+<resources>
+  <string name="no_camera_access" description="Message displayed if user has not granted CAMERA permission. [CHAR_LIMIT=NONE]">Camera permission missing</string>
+</resources>

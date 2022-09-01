@@ -1,0 +1,51 @@
+//
+// Copyright 2020-2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+syntax = "proto2";
+
+package magritte;
+
+import "mediapipe/framework/calculator.proto";
+
+message PixelizationCalculatorOptions {
+  extend mediapipe.CalculatorOptions {
+    optional PixelizationCalculatorOptions ext = 340832482;
+  }
+
+  oneof one_of_downsized_resolution {
+    // if none of those two fields is set,
+    // it will be calculated with default value of total_nb_pixels
+    // It's used to provide the total number of pixels the downsized image
+    float total_nb_pixels = 1 [default = 576.0];
+    // It's used to provide the length of the longer side of the downsized image
+    float max_resolution = 5;
+  }
+
+  optional bool ignore_mask = 2 [default = false];
+  // Works only for a CPU calculator for now
+  optional bool median_filter_enabled = 3 [default = false];
+  // median_filter_ksize must be odd positive number
+  // The higher the value, the more noticeable the effect
+  optional int32 median_filter_ksize = 4 [default = 5];
+
+  enum BlendMethod {
+    DEFAULT = 0;
+    PIXELIZATION = 1;  // Nearest
+    LINEAR_INTERPOLATION = 2;
+    CUBIC_INTERPOLATION = 3; // CPU version only
+  }
+
+  optional BlendMethod blend_method = 6 [default = PIXELIZATION];
+}

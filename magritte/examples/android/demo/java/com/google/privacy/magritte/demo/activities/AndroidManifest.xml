@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.privacy.magritte.demo">
+  <uses-sdk
+      android:minSdkVersion="25" />
+  <!-- This is where library specific manifest attributes are defined. -->
+  <application ></application>
+</manifest>

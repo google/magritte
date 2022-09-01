@@ -1,0 +1,56 @@
+#
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "SampledTrackingSubgraphCpu"
+
+# A graph that performs motion tracking on detections, and in addition performs
+# sampling on the input video stream. It is similar to the tracking graphs
+# without sampling in this directory, and in addition it outputs a downsampled
+# version of the input video stream with 5 fps. This downsampled video stream
+# can be used for performing detections that are fed back into this graph.
+#
+# Inputs:
+# - input_video: The ImageFrame stream in which objects should be tracked. Its
+#   motion will be analyzed for the tracking.
+# - sampled_detections: The detections to be tracked. They are expected to be
+#   calculated from the sampled_input_video output stream of this graph.
+#
+# Outputs:
+# - tracked_detections: Resulting tracked detections.
+# - sampled_input_video: The input video stream downsampled to 5 fps.
+
+input_stream: "IMAGE:input_video"
+input_stream: "DETECTIONS:sampled_detections"
+output_stream: "IMAGE:sampled_input_video"
+output_stream: "DETECTIONS:tracked_detections"
+
+node {
+  calculator: "PacketResamplerCalculator"
+  input_stream: "DATA:input_video"
+  output_stream: "DATA:sampled_input_video"
+  node_options: {
+    [type.googleapis.com/mediapipe.PacketResamplerCalculatorOptions] {
+      frame_rate: 5
+    }
+  }
+}
+
+node {
+  calculator: "TrackingSubgraphCpu"
+  input_stream: "IMAGE:input_video"
+  input_stream: "DETECTIONS:sampled_detections"
+  output_stream: "DETECTIONS:tracked_detections"
+}

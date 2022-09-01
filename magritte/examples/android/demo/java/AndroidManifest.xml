@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.privacy.magritte.demo">
+
+  <!-- We need access to camera -->
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.CAMERA_OPEN_CLOSE_LISTENER" />
+  <uses-feature android:name="android.hardware.camera" />
+  <uses-feature android:name="android.hardware.camera.autofocus" />
+
+  <uses-sdk
+      android:minSdkVersion="25"
+      android:targetSdkVersion="30"/>
+  <application
+      android:allowBackup="true"
+      android:label="Magritte Demo"
+      android:supportsRtl="true"
+      android:theme="@style/AppTheme">
+    <activity android:name="com.google.privacy.magritte.demo.activities.AppMainActivity"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+  </application>
+
+</manifest>

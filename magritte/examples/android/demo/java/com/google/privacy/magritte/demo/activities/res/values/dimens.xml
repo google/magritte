@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="camera_toggle_dim">46dp</dimen>
+  <dimen name="top_icon_padding">6dp</dimen>
+  <dimen name="icon_margin">16dp</dimen>
+</resources>

@@ -1,0 +1,179 @@
+#
+# Copyright 2021-2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "FaceDetection360ShortAndFullRangeSubgraphCpu"
+
+# A face detection subgraph that supports all orientations, and both short and
+# full ranges.
+#
+# This subgraph utilizes a face detection method that only supports orientations
+# of up to +/- 45°. Thus the image is rotated 0°, 90°, 180° and 270°, the
+# detection method is applied in each rotated image, and the corresponding
+# detections are rotated back. Finally, a non-max suppression is applied to
+# remove duplicate detections.
+#
+# Inputs:
+# - IMAGE: The ImageFrame stream containing the image on which faces will be
+#   detected.
+#
+# Outputs:
+# - DETECTIONS: A list of face detections as std::vector<mediapipe::Detection>.
+
+input_stream: "IMAGE:input_video"
+output_stream: "DETECTIONS:output_detections"
+
+# Extracts image size from the input images.
+node {
+  calculator: "ImagePropertiesCalculator"
+  input_stream: "IMAGE:input_video"
+  output_stream: "SIZE:image_size"
+}
+
+############################################# 0° Rotation
+node: {
+  calculator: "ImageTransformationCalculator"
+  input_stream: "IMAGE:input_video"
+  output_stream: "IMAGE:input_video1"
+  node_options: {
+    [type.googleapis.com/mediapipe.ImageTransformationCalculatorOptions] {
+      rotation_mode: ROTATION_0
+    }
+  }
+}
+
+node {
+  calculator: "FaceDetectionShortAndFullRangeSubgraphCpu"
+  input_stream: "IMAGE:input_video1"
+  output_stream: "DETECTIONS:detections1_rotated"
+}
+
+node {
+  calculator: "DetectionTransformationCalculator"
+  input_stream: "DETECTIONS:detections1_rotated"
+  input_stream: "SIZE:image_size"
+  output_stream: "DETECTIONS:detections1"
+  node_options: {
+    [type.googleapis.com/magritte.RotationCalculatorOptions] {
+      rotation_mode: ROTATION_0
+    }
+  }
+}
+############################################# 90° Rotation
+node: {
+  calculator: "ImageTransformationCalculator"
+  input_stream: "IMAGE:input_video"
+  output_stream: "IMAGE:input_video2"
+  node_options: {
+    [type.googleapis.com/mediapipe.ImageTransformationCalculatorOptions] {
+      rotation_mode: ROTATION_90
+    }
+  }
+}
+
+node {
+  calculator: "FaceDetectionShortAndFullRangeSubgraphCpu"
+  input_stream: "IMAGE:input_video2"
+  output_stream: "DETECTIONS:detections2_rotated"
+}
+
+node {
+  calculator: "DetectionTransformationCalculator"
+  input_stream: "DETECTIONS:detections2_rotated"
+  input_stream: "SIZE:image_size"
+  output_stream: "DETECTIONS:detections2"
+  node_options: {
+    [type.googleapis.com/magritte.RotationCalculatorOptions] {
+      rotation_mode: ROTATION_270
+    }
+  }
+}
+############################################# 180° Rotation
+node: {
+  calculator: "ImageTransformationCalculator"
+  input_stream: "IMAGE:input_video"
+  output_stream: "IMAGE:input_video3"
+  node_options: {
+    [type.googleapis.com/mediapipe.ImageTransformationCalculatorOptions] {
+      rotation_mode: ROTATION_180
+    }
+  }
+}
+
+node {
+  calculator: "FaceDetectionShortAndFullRangeSubgraphCpu"
+  input_stream: "IMAGE:input_video3"
+  output_stream: "DETECTIONS:detections3_rotated"
+}
+
+node {
+  calculator: "DetectionTransformationCalculator"
+  input_stream: "DETECTIONS:detections3_rotated"
+  input_stream: "SIZE:image_size"
+  output_stream: "DETECTIONS:detections3"
+  node_options: {
+    [type.googleapis.com/magritte.RotationCalculatorOptions] {
+      rotation_mode: ROTATION_180
+    }
+  }
+}
+############################################# 270° Rotation
+node: {
+  calculator: "ImageTransformationCalculator"
+  input_stream: "IMAGE:input_video"
+  output_stream: "IMAGE:input_video4"
+  node_options: {
+    [type.googleapis.com/mediapipe.ImageTransformationCalculatorOptions] {
+      rotation_mode: ROTATION_270
+    }
+  }
+}
+
+node {
+  calculator: "FaceDetectionShortAndFullRangeSubgraphCpu"
+  input_stream: "IMAGE:input_video4"
+  output_stream: "DETECTIONS:detections4_rotated"
+}
+
+node {
+  calculator: "DetectionTransformationCalculator"
+  input_stream: "DETECTIONS:detections4_rotated"
+  input_stream: "SIZE:image_size"
+  output_stream: "DETECTIONS:detections4"
+  node_options: {
+    [type.googleapis.com/magritte.RotationCalculatorOptions] {
+      rotation_mode: ROTATION_90
+    }
+  }
+}
+############################################# End of rotations
+
+# Performs non-max suppression to remove duplicate detections.
+node {
+  calculator: "NonMaxSuppressionCalculator"
+  input_stream: "detections1"
+  input_stream: "detections2"
+  input_stream: "detections3"
+  input_stream: "detections4"
+  output_stream: "output_detections"
+  node_options: {
+    [type.googleapis.com/mediapipe.NonMaxSuppressionCalculatorOptions] {
+      num_detection_streams: 4
+      min_suppression_threshold: 0.3
+      overlap_type: INTERSECTION_OVER_UNION
+      return_empty_detections: true
+    }
+  }
+}

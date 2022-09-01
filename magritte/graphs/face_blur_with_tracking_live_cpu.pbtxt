@@ -1,0 +1,76 @@
+#
+# Copyright 2019-2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# A graph that detects/tracks faces and blurs them using simple box blur.
+#
+# Note that simple blurring is not an effective de-identification method!
+#
+# The face detection supports all orientations and both short and full ranges.
+#
+# Once detected, moving faces are tracked with mediapipe object tracking.
+#
+# This graph is specialized for CPU architectures and live environments,
+# tracking movements at a fixed frame rate of 5 fps.
+#
+# Inputs:
+# - input_video: An ImageFrame stream containing the image on which detection
+#   models are run.
+#
+# Outputs:
+# - output_video: An ImageFrame stream containing the blurred image.
+
+package: "magritte"
+type: "FaceBlurWithTrackingLiveCpu"
+
+input_stream: "input_video"
+output_stream: "output_video"
+
+node {
+  calculator: "FlowLimiterCalculator"
+  input_stream: "input_video"
+  input_stream: "FINISHED:output_video"
+  input_stream_info: {
+    tag_index: "FINISHED"
+    back_edge: true
+  }
+  output_stream: "throttled_input_video"
+}
+
+node {
+  calculator: "SampledTrackingSubgraphCpu"
+  input_stream: "IMAGE:throttled_input_video"
+  input_stream: "DETECTIONS:sampled_detections"
+  output_stream: "IMAGE:sampled_input_video"
+  output_stream: "DETECTIONS:tracked_detections"
+}
+
+node {
+  calculator: "FaceDetection360ShortAndFullRangeSubgraphCpu"
+  input_stream: "IMAGE:sampled_input_video"
+  output_stream: "DETECTIONS:sampled_detections"
+}
+
+node {
+  calculator: "SimpleBlurCalculatorCpu"
+  input_stream: "FRAMES:throttled_input_video"
+  input_stream: "DETECTIONS:tracked_detections"
+  output_stream: "FRAMES:output_video"
+  node_options: {
+    [type.googleapis.com/magritte.SimpleBlurCalculatorOptions] {
+      blur_type: BOX_BLUR
+    }
+  }
+}

@@ -1,0 +1,142 @@
+#
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "FaceDetection360ShortRangeByRoiSubgraphCpu"
+
+# A face detection subgraph that supports all orientations.
+#
+# This subgraph only supports short-range detection, e.g. from a phone's front
+# camera.
+#
+# This subgraph utilizes a face detection method that only supports orientations
+# of up to +/- 45°, but can take a Region of Interest (ROI) as a NormalizedRect,
+# on which the faces will be detected. Thus, a ROI including the whole image
+# is created for rotations of 0°, 90°, 180° and 270°, and the detection method
+# is applied in those ROIs. Finally, a non-max suppression is applied to remove
+# duplicate detections.
+#
+# This subgraph is up to 5% more efficient than
+# FaceDetection360ShortAndFullRangeSubgraphCpu, though it does not support
+# full-range detection.
+#
+# Inputs:
+# - IMAGE: The ImageFrame stream containing the image on which faces will be
+#   detected.
+#
+# Outputs:
+# - DETECTIONS: A list of face detections as std::vector<mediapipe::Detection>.
+
+input_stream: "IMAGE:input_video"
+output_stream: "DETECTIONS:output_detections"
+
+############################################# 0° Rotation
+node: {
+  calculator: "RotationRoiCalculator"
+  input_stream: "input_video"
+  output_stream: "ROI:roi0"
+  node_options: {
+    [type.googleapis.com/magritte.RotationCalculatorOptions] {
+      rotation_mode: ROTATION_0
+      clockwise: true
+    }
+  }
+}
+
+node: {
+  calculator: "FaceDetectionShortRangeByRoiCpu"
+  input_stream: "IMAGE:input_video"
+  input_stream: "ROI:roi0"
+  output_stream: "DETECTIONS:detections0"
+}
+
+############################################# 90° Rotation
+node: {
+  calculator: "RotationRoiCalculator"
+  input_stream: "input_video"
+  output_stream: "ROI:roi90"
+  node_options: {
+    [type.googleapis.com/magritte.RotationCalculatorOptions] {
+      rotation_mode: ROTATION_90
+      clockwise: true
+    }
+  }
+}
+
+node: {
+  calculator: "FaceDetectionShortRangeByRoiCpu"
+  input_stream: "IMAGE:input_video"
+  input_stream: "ROI:roi90"
+  output_stream: "DETECTIONS:detections90"
+}
+
+############################################# 180° Rotation
+node: {
+  calculator: "RotationRoiCalculator"
+  input_stream: "input_video"
+  output_stream: "ROI:roi180"
+  node_options: {
+    [type.googleapis.com/magritte.RotationCalculatorOptions] {
+      rotation_mode: ROTATION_180
+      clockwise: true
+    }
+  }
+}
+
+node: {
+  calculator: "FaceDetectionShortRangeByRoiCpu"
+  input_stream: "IMAGE:input_video"
+  input_stream: "ROI:roi180"
+  output_stream: "DETECTIONS:detections180"
+}
+
+############################################# 270° Rotation
+node: {
+  calculator: "RotationRoiCalculator"
+  input_stream: "input_video"
+  output_stream: "ROI:roi270"
+  node_options: {
+    [type.googleapis.com/magritte.RotationCalculatorOptions] {
+      rotation_mode: ROTATION_270
+      clockwise: true
+    }
+  }
+}
+
+node: {
+  calculator: "FaceDetectionShortRangeByRoiCpu"
+  input_stream: "IMAGE:input_video"
+  input_stream: "ROI:roi270"
+  output_stream: "DETECTIONS:detections270"
+}
+############################################# End of rotations
+
+# Performs non-max suppression to remove duplicate detections.
+node {
+  calculator: "NonMaxSuppressionCalculator"
+  input_stream: "detections0"
+  input_stream: "detections90"
+  input_stream: "detections180"
+  input_stream: "detections270"
+  output_stream: "output_detections"
+  node_options: {
+    [type.googleapis.com/mediapipe.NonMaxSuppressionCalculatorOptions] {
+      num_detection_streams: 4
+      min_suppression_threshold: 0.3
+      overlap_type: INTERSECTION_OVER_UNION
+      return_empty_detections: true
+    }
+  }
+}

@@ -1,0 +1,56 @@
+#
+# Copyright 2020-2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "FaceStickerRedactionOfflineCpu"
+
+# A graph that detects and redacts faces with an opaque "sticker" image.
+#
+# The sticker image file is specified manually in this graph. We use one of the
+# files in the test_data directory.
+#
+# Inputs:
+# - input_video: The ImageFrame stream containing the image to be redacted.
+#
+# Input side packets:
+# - sticker_image: The file path for the sticker image in the PNG format. If not
+#   provided, defaults to
+#   [emoji.png](https://github.com/google/magritte/blob/master/magritte/test_data/emoji.png).
+# - sticker_zoom: The default sticker zoom as a float. This is a default extra
+#   zoom that is applied to the sticker once it covers the face detection
+#   bounding box. If not provided, the default value is 1.
+#
+# Outputs:
+# - output_video: An ImageFrame stream containing the redacted image.
+
+input_stream: "input_video"
+input_side_packet: "sticker_image"
+input_side_packet: "sticker_zoom"
+output_stream: "output_video"
+
+node {
+  calculator: "FaceDetection360ShortRangeByRoiSubgraphCpu"
+  input_stream: "IMAGE:input_video"
+  output_stream: "DETECTIONS:detections"
+}
+
+node {
+  calculator: "FaceStickerRedactionSubgraphCpu"
+  input_stream: "IMAGE:input_video"
+  input_stream: "DETECTIONS:detections"
+  input_side_packet: "STICKER_PATH:sticker_image"
+  input_side_packet: "STICKER_ZOOM:sticker_zoom"
+  output_stream: "IMAGE:output_video"
+}

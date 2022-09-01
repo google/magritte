@@ -1,0 +1,44 @@
+#
+# Copyright 2019-2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "FacePixelizationOfflineCpu"
+
+# A graph that detects and redacts faces by pixelizing them.
+#
+# This graph is specialized for CPU architectures and offline environments
+# (no throttling is applied).
+#
+# Inputs:
+# - input_video: The ImageFrame stream containing the image to be redacted.
+#
+# Outputs:
+# - output_video: An ImageFrame stream containing the redacted image.
+
+input_stream: "input_video"
+output_stream: "output_video"
+
+node {
+  calculator: "FaceDetectionShortAndFullRangeSubgraphCpu"
+  input_stream: "IMAGE:input_video"
+  output_stream: "DETECTIONS:detections"
+}
+
+node {
+  calculator: "FacePixelizationSubgraphCpu"
+  input_stream: "IMAGE:input_video"
+  input_stream: "DETECTIONS:detections"
+  output_stream: "IMAGE:output_video"
+}
