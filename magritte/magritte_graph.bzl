@@ -184,7 +184,7 @@ def _magritte_resources_folder_impl(ctx):
     output_folder = ctx.attr.name
     created_files = []
     for file in ctx.files.runtime_data:
-        relative_path = file.path.replace("external/mediapipe/", "")
+        relative_path = file.path.removeprefix("external/mediapipe/")
         output_file = ctx.actions.declare_file(paths.join(output_folder, relative_path))
         created_files.append(output_file)
         if ctx.attr.is_windows:

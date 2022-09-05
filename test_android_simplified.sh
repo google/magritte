@@ -23,7 +23,7 @@ set -e
 # Display commands being run.
 set -x
 
-using bazel-4.2.1
+using bazel-5.2.0
 using cmake-3.17.2
 using clang-10.0.0
 using ndk-r21e

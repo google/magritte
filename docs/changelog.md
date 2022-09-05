@@ -14,5 +14,7 @@ library.
 *   First release to GitHub.
 *   New graphs: face blurring, face overlay, face pixelization, face sticker
     redaction.
+*   Magritte library API that simplifies common tasks by providing abstractions
+    around the use of MediaPipe in many places.
 *   Added Android and desktop example apps.
-*   Added documentation.
+*   Added documentation and C++ codelab.

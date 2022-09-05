@@ -116,13 +116,13 @@ RUN wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/c
     rm clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz
 
 ################################################################################
-# using bazel-4.2.1
+# using bazel-5.2.0
 ################################################################################
 WORKDIR /bin
-RUN wget https://github.com/bazelbuild/bazel/releases/download/4.2.1/bazel-4.2.1-linux-x86_64 && \
-    mkdir bazel-4.2.1 && \
-    mv bazel-4.2.1-linux-x86_64 bazel-4.2.1/bazel && \
-    chmod +x bazel-4.2.1/bazel
+RUN wget https://github.com/bazelbuild/bazel/releases/download/5.2.0/bazel-5.2.0-linux-x86_64 && \
+    mkdir bazel-5.2.0 && \
+    mv bazel-5.2.0-linux-x86_64 bazel-5.2.0/bazel && \
+    chmod +x bazel-5.2.0/bazel
 
 ################################################################################
 # using ndk-r21e
@@ -176,7 +176,7 @@ RUN wget https://sourceforge.net/projects/doxygen/files/rel-1.8.18/doxygen-1.8.1
 ################################################################################
 # Toolchain environment scripts
 ################################################################################
-RUN ln -s /bin/bazel-4.2.1/bazel /bin/bazel
+RUN ln -s /bin/bazel-5.2.0/bazel /bin/bazel
 
 ################################################################################
 # Magritte Requirements
@@ -203,4 +203,4 @@ RUN groupadd --gid "${gid}" "${groupname}" \
 
 USER "${username}"
 
-LABEL Name=ubuntu-build Version=0.0.7
+LABEL Name=ubuntu-build Version=0.0.8

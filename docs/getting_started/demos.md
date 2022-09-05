@@ -27,10 +27,10 @@ We also provide a
 [`Dockerfile`](https://github.com/google/magritte/blob/main/Dockerfile)
 with all dependencies installed.
 
-### Install Bazel 4.2.1
+### Install Bazel 5.2.0
 Follow the
 [Bazel documentation](https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu)
-to install Bazel from its apt repository. Make sure you use version 4.2.1.
+to install Bazel from its apt repository. Make sure you use version 5.2.0.
 
 Another option is to
 [install Bazelisk](https://docs.bazel.build/versions/main/install-bazelisk.html),
