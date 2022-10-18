@@ -74,7 +74,7 @@ jobs:
         wget https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
         tar -xvzf ./codeql-bundle-linux64.tar.gz
         export PATH="$PATH:$(pwd)/codeql"
-        apt-get install -y python3-numpy
+        sudo apt-get install -y python3-numpy
 
         # Build using the following Bazel flags, to help CodeQL detect the build:
         # `--spawn_strategy=local`: build locally, instead of using a distributed build
