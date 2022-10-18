@@ -67,24 +67,24 @@ jobs:
 
     - name: Build Application using Bazel
       run: |
-      echo "Run, Build Application using Bazel"
-      # Before building, remove cached objects and stop all running Bazel server processes.
-      bazel clean --expunge
+        echo "Run, Build Application using Bazel"
+        # Before building, remove cached objects and stop all running Bazel server processes.
+        bazel clean --expunge
 
-      # Build using the following Bazel flags, to help CodeQL detect the build:
-      # `--spawn_strategy=local`: build locally, instead of using a distributed build
-      # `--nouse_action_cache`: turn off build caching, which might prevent recompilation of source code
-      # `--noremote_accept_cached`, `--noremote_upload_local_results`: avoid using a remote cache
-      codeql database create cpp-database --language=cpp \
-        --command='bazel build --cxxopt="-std=c++17" --experimental_repo_remote_exec --spawn_strategy=local --nouse_action_cache --noremote_accept_cached --noremote_upload_local_results -- //magritte:all //magritte/graphs/... //magritte/calculators/... //magritte/api/... //magritte/examples/... -//magritte/examples/android/...'
+        # Build using the following Bazel flags, to help CodeQL detect the build:
+        # `--spawn_strategy=local`: build locally, instead of using a distributed build
+        # `--nouse_action_cache`: turn off build caching, which might prevent recompilation of source code
+        # `--noremote_accept_cached`, `--noremote_upload_local_results`: avoid using a remote cache
+        codeql database create cpp-database --language=cpp \
+          --command='bazel build --cxxopt="-std=c++17" --experimental_repo_remote_exec --spawn_strategy=local --nouse_action_cache --noremote_accept_cached --noremote_upload_local_results -- //magritte:all //magritte/graphs/... //magritte/calculators/... //magritte/api/... //magritte/examples/... -//magritte/examples/android/...'
 
-      codeql database create java-database --language=java \
-        --command='bazel build --cxxopt="-std=c++17" --experimental_repo_remote_exec --define EXCLUDE_OPENCV_SO_LIB=1 //magritte/examples/android/demo/java:magritte_demo'
+        codeql database create java-database --language=java \
+          --command='bazel build --cxxopt="-std=c++17" --experimental_repo_remote_exec --define EXCLUDE_OPENCV_SO_LIB=1 //magritte/examples/android/demo/java:magritte_demo'
 
-      # After building, stop all running Bazel server processes.
-      # This ensures future build commands start in a clean Bazel server process
-      # without CodeQL attached.
-      bazel shutdown
+        # After building, stop all running Bazel server processes.
+        # This ensures future build commands start in a clean Bazel server process
+        # without CodeQL attached.
+        bazel shutdown
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
