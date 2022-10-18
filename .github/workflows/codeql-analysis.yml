@@ -70,6 +70,10 @@ jobs:
         echo "Run, Build Application using Bazel"
         # Before building, remove cached objects and stop all running Bazel server processes.
         bazel clean --expunge
+        
+        wget https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
+        tar -xvzf ./codeql-bundle-linux64.tar.gz
+        export PATH="$PATH:$(pwd)/codeql"
 
         # Build using the following Bazel flags, to help CodeQL detect the build:
         # `--spawn_strategy=local`: build locally, instead of using a distributed build
