@@ -164,7 +164,7 @@ TEST_P(BlendCalculatorTest, TestBlend) {
   const mediapipe::ImageFrame& output_frame =
       actual_output[0].Get<mediapipe::ImageFrame>();
   EXPECT_EQ(output_frame.Format(), expected->Format());
-  auto diff_image = absl::make_unique<mediapipe::ImageFrame>();
+  auto diff_image = std::make_unique<mediapipe::ImageFrame>();
   MP_EXPECT_OK(mediapipe::CompareImageFrames(
       *expected, output_frame, /* max_color_diff= */ 0.0,
       /* max_alpha_diff= */ 0.0, /* max_avg_diff= */ 0.0, diff_image))

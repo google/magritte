@@ -16,6 +16,7 @@
 #include "magritte/calculators/rois_to_sprite_list_calculator.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/image_frame.h"
@@ -155,7 +156,7 @@ absl::Status RoisToSpriteListCalculator::OpenGpu(CalculatorContext* cc) {
 
 absl::Status RoisToSpriteListCalculator::Process(CalculatorContext* cc) {
   RET_CHECK(cc != nullptr) << "CalculatorContext is nullptr.";
-  auto sprite_list = absl::make_unique<SpriteList>();
+  auto sprite_list = std::make_unique<SpriteList>();
 
   if (cc->Inputs().Tag(kNormalizedRectsTag).IsEmpty()) {
     cc->Outputs()

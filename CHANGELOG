@@ -5,6 +5,9 @@
 ### Added
 -
 
+### Changed
+- Replace absl::make_unique with std::make_unique (introduced in C++14).
+
 ## [1.0.0]
 
 ### Added

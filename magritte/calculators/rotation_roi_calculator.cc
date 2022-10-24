@@ -15,6 +15,8 @@
 //
 #include "magritte/calculators/rotation_roi_calculator.h"
 
+#include <memory>
+
 #include "mediapipe/framework/calculator_framework.h"
 #include "absl/memory/memory.h"
 #include "magritte/calculators/rotation_calculator_options.pb.h"
@@ -82,7 +84,7 @@ absl::Status RotationRoiCalculator::Process(CalculatorContext* cc) {
       break;
   }
 
-  auto rect = absl::make_unique<NormalizedRect>();
+  auto rect = std::make_unique<NormalizedRect>();
   rect->set_x_center(0.5);
   rect->set_y_center(0.5);
   rect->set_height(1.0);

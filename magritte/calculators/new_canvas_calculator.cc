@@ -110,7 +110,7 @@ absl::Status NewCanvasCalculator::ProcessCpu(CalculatorContext* cc) {
   std::pair<int, int> size =
       GetSizeFromOptions(options, frame.Width(), frame.Height());
   auto output_frame =
-      absl::make_unique<ImageFrame>(frame.Format(), size.first, size.second);
+      std::make_unique<ImageFrame>(frame.Format(), size.first, size.second);
 
   cv::Mat src = MatView(output_frame.get());
   const mediapipe::Color color = options.color();
