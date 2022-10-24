@@ -16,6 +16,7 @@
 // An example of sending video frames into a Magritte graph.
 #include <cstdlib>
 #include <map>
+#include <memory>
 
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/image_frame.h"
@@ -125,7 +126,7 @@ absl::Status RunMediaPipeGraph() {
     }
 
     // Wrap Mat into an ImageFrame.
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
+    auto input_frame = std::make_unique<mediapipe::ImageFrame>(
         mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
         mediapipe::ImageFrame::kDefaultAlignmentBoundary);
     cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());

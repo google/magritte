@@ -64,7 +64,7 @@ class DetectionListToDetectionsCalculator : public CalculatorBase {
 
     DetectionList detectionList =
         cc->Inputs().Tag(kDetectionListTag).Get<DetectionList>();
-    auto output_detections = absl::make_unique<Detections>();
+    auto output_detections = std::make_unique<Detections>();
     for (const Detection& detection : detectionList.detection()) {
       output_detections->emplace_back(detection);
     }

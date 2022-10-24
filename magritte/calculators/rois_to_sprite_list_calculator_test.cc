@@ -16,6 +16,7 @@
 #include "magritte/calculators/rois_to_sprite_list_calculator.h"
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 #include "mediapipe/framework/formats/image_frame_opencv.h"
@@ -73,8 +74,8 @@ constexpr char kCalculatorGraphProto[] = R"pb(
 std::unique_ptr<ImageFrame> LoadRgbaPng(std::string filename) {
   cv::Mat mat = cv::imread(filename, cv::IMREAD_UNCHANGED);
   cv::cvtColor(mat, mat, cv::COLOR_BGRA2RGBA);
-  auto image_frame = absl::make_unique<ImageFrame>(
-      ImageFormat::SRGBA, mat.cols, mat.rows);
+  auto image_frame =
+      std::make_unique<ImageFrame>(ImageFormat::SRGBA, mat.cols, mat.rows);
   mat.copyTo(MatView(image_frame.get()));
   return image_frame;
 }
@@ -183,11 +184,11 @@ INSTANTIATE_TEST_SUITE_P(
 // returns a Packet containing the corresponding ImageFrame.
 Packet RunCalculatorWithSticker(std::unique_ptr<ImageFrame> sticker,
                                 bool sticker_is_premultiplied) {
-  auto image_size = absl::make_unique<SizeInt>(64, 64);
+  auto image_size = std::make_unique<SizeInt>(64, 64);
   Packet image_size_packet =
       mediapipe::Adopt(image_size.release()).At(Timestamp(0));
 
-  auto rois = absl::make_unique<std::vector<NormalizedRect>>();
+  auto rois = std::make_unique<std::vector<NormalizedRect>>();
   // Using a blank ROI so that at least one sprite is returned.
   rois->push_back(NormalizedRect());
   Packet rois_packet = mediapipe::Adopt(rois.release()).At(Timestamp(0));
@@ -267,11 +268,11 @@ TEST(RoisToSpriteListCalculatorCpuTest, NoAlphaStickerTest) {
   const cv::Scalar green_with_alpha(/*red=*/0.f, /*green=*/255.f, /*blue=*/0.f,
                                     /*alpha=*/255.f);
 
-  auto input_sticker = absl::make_unique<ImageFrame>(
+  auto input_sticker = std::make_unique<ImageFrame>(
       ImageFormat::SRGB, /*width=*/16, /*height=*/16);
   MatView(input_sticker.get()).setTo(green_no_alpha);
 
-  auto expected_sticker = absl::make_unique<ImageFrame>(
+  auto expected_sticker = std::make_unique<ImageFrame>(
       ImageFormat::SRGBA, /*width=*/16, /*height=*/16);
   MatView(expected_sticker.get()).setTo(green_with_alpha);
 
@@ -289,14 +290,14 @@ TEST(RoisToSpriteListCalculatorCpuTest, NoAlphaStickerTest) {
 
 // Tests whether SpritePose is built correctly.
 TEST(RoisToSpriteListCalculatorCpuTest, SpritePoseTest) {
-  auto image_size = absl::make_unique<SizeInt>(64, 64);
+  auto image_size = std::make_unique<SizeInt>(64, 64);
   Packet image_size_packet =
       mediapipe::Adopt(image_size.release()).At(Timestamp(0));
 
-  auto sticker = absl::make_unique<ImageFrame>(
-      ImageFormat::SRGB, /*width=*/64, /*height=*/64);
+  auto sticker = std::make_unique<ImageFrame>(ImageFormat::SRGB, /*width=*/64,
+                                              /*height=*/64);
 
-  auto rois = absl::make_unique<std::vector<NormalizedRect>>();
+  auto rois = std::make_unique<std::vector<NormalizedRect>>();
   rois->push_back(mediapipe::ParseTextProtoOrDie<NormalizedRect>(std::string(R"pb(
     width: 1.0f
     height: 1.0f

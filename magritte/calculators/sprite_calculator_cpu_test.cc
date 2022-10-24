@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+#include <memory>
 #include <vector>
 
 #include "mediapipe/framework/formats/image_frame_opencv.h"
@@ -61,8 +62,8 @@ constexpr char kCalculatorGraphProto[] = R"pb(
 std::unique_ptr<ImageFrame> LoadRgbaPng(std::string filename) {
   cv::Mat mat = cv::imread(filename, cv::IMREAD_UNCHANGED);
   cv::cvtColor(mat, mat, cv::COLOR_BGRA2RGBA);
-  auto image_frame = absl::make_unique<ImageFrame>(
-      ImageFormat::SRGBA, mat.cols, mat.rows);
+  auto image_frame =
+      std::make_unique<ImageFrame>(ImageFormat::SRGBA, mat.cols, mat.rows);
   mat.copyTo(MatView(image_frame.get()));
   return image_frame;
 }
@@ -77,7 +78,7 @@ Packet RunCalculatorWithInput(std::unique_ptr<ImageFrame> background,
   Packet sprite_frame_packet =
       mediapipe::Adopt(sprite.release()).At(Timestamp(0));
 
-  auto sprite_list = absl::make_unique<SpriteList>();
+  auto sprite_list = std::make_unique<SpriteList>();
   for (const auto& pose : poses) {
     sprite_list->push_back(SpriteListElement(sprite_frame_packet, pose));
   }
@@ -158,11 +159,11 @@ TEST(SpriteCpuCalculatorTest, OneReallyBigStamp) {
   const cv::Scalar green_with_alpha(/*red=*/0.f, /*green=*/255.f, /*blue=*/0.f,
                                     /*alpha=*/255.f);
 
-  auto sprite_frame = absl::make_unique<ImageFrame>(
-      ImageFormat::SRGBA, /*width=*/64, /*height=*/64);
+  auto sprite_frame = std::make_unique<ImageFrame>(ImageFormat::SRGBA,
+                                                   /*width=*/64, /*height=*/64);
   MatView(sprite_frame.get()).setTo(green_with_alpha);
 
-  auto expected_result_frame = absl::make_unique<ImageFrame>(
+  auto expected_result_frame = std::make_unique<ImageFrame>(
       ImageFormat::SRGBA, /*width=*/64, /*height=*/64);
   MatView(expected_result_frame.get()).setTo(green_with_alpha);
 

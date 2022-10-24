@@ -70,7 +70,7 @@ absl::Status Run(const std::string& graph_name, const std::string& input_file,
     ++frame_number;
 
     // Convert raw frame into an ImageFrame with the right format.
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
+    auto input_frame = std::make_unique<mediapipe::ImageFrame>(
         mediapipe::ImageFormat::SRGB, frame_raw.cols, frame_raw.rows,
         mediapipe::ImageFrame::kDefaultAlignmentBoundary);
     cv::cvtColor(frame_raw, mediapipe::formats::MatView(input_frame.get()),
