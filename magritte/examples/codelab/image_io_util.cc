@@ -38,7 +38,7 @@ absl::StatusOr<std::unique_ptr<mediapipe::ImageFrame>> LoadFromFile(
     return absl::UnimplementedError("Expected image in CV_8UC3 format");
   }
   std::unique_ptr<mediapipe::ImageFrame> image_frame =
-      absl::make_unique<mediapipe::ImageFrame>(
+      std::make_unique<mediapipe::ImageFrame>(
           mediapipe::ImageFormat::SRGB, mat.size().width, mat.size().height);
   // OpenCV returns color images in BGR format, so we need to convert.
   cv::cvtColor(mat, mediapipe::formats::MatView(image_frame.get()),
