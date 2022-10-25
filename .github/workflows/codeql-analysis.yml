@@ -81,10 +81,10 @@ jobs:
         # `--nouse_action_cache`: turn off build caching, which might prevent recompilation of source code
         # `--noremote_accept_cached`, `--noremote_upload_local_results`: avoid using a remote cache
         codeql database create cpp-database --language=cpp \
-          --command="bazel build --cxxopt='-std=c++17' --experimental_repo_remote_exec --spawn_strategy=local --nouse_action_cache --noremote_accept_cached --noremote_upload_local_results -- //magritte:all //magritte/graphs/... //magritte/calculators/... //magritte/api/... //magritte/examples/... -//magritte/examples/android/..."
+          --command="bazel build --cxxopt=-std=c++17 --experimental_repo_remote_exec --spawn_strategy=local --nouse_action_cache --noremote_accept_cached --noremote_upload_local_results -- //magritte:all //magritte/graphs/... //magritte/calculators/... //magritte/api/... //magritte/examples/... -//magritte/examples/android/..."
 
         codeql database create java-database --language=java \
-          --command="bazel build --cxxopt='-std=c++17' --experimental_repo_remote_exec --define EXCLUDE_OPENCV_SO_LIB=1 //magritte/examples/android/demo/java:magritte_demo"
+          --command="bazel build --cxxopt=-std=c++17 --experimental_repo_remote_exec --define EXCLUDE_OPENCV_SO_LIB=1 //magritte/examples/android/demo/java:magritte_demo"
 
         # After building, stop all running Bazel server processes.
         # This ensures future build commands start in a clean Bazel server process
