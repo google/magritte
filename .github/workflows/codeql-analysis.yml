@@ -74,7 +74,9 @@ jobs:
         wget https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
         tar -xvzf ./codeql-bundle-linux64.tar.gz
         export PATH="$PATH:$(pwd)/codeql"
-        sudo apt-get install -y python3-numpy
+        sudo apt-get install -y python3-numpy libopencv-core-dev libopencv-highgui-dev \
+                     libopencv-calib3d-dev libopencv-features2d-dev \
+                     libopencv-imgproc-dev libopencv-video-dev
         sed -i '/include\/opencv4/s/#//g' third_party/opencv_linux.BUILD
 
         # Build using the following Bazel flags, to help CodeQL detect the build:
