@@ -75,6 +75,7 @@ jobs:
         tar -xvzf ./codeql-bundle-linux64.tar.gz
         export PATH="$PATH:$(pwd)/codeql"
         sudo apt-get install -y python3-numpy
+        sed -i '/include\/opencv4/s/#//g' third_party/opencv_linux.BUILD
 
         # Build using the following Bazel flags, to help CodeQL detect the build:
         # `--spawn_strategy=local`: build locally, instead of using a distributed build
