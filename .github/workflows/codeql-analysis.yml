@@ -76,7 +76,7 @@ jobs:
         export PATH="$PATH:$(pwd)/codeql"
         sudo apt-get install -y python3-numpy libopencv-core-dev libopencv-highgui-dev \
           libopencv-calib3d-dev libopencv-features2d-dev \
-          libopencv-imgproc-dev libopencv-video-dev \
+          libopencv-imgproc-dev libopencv-video-dev libopencv-contrib-dev \
           mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
         sed -i '/include\/opencv4/s/#//g' third_party/opencv_linux.BUILD
 
