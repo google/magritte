@@ -45,9 +45,9 @@ using ::mediapipe::GlTexture;
 using ::mediapipe::GpuBuffer;
 #endif  // !MEDIAPIPE_DISABLE_GPU
 using ::mediapipe::MakePacket;
-using ::mediapipe::NormalizedRect;
 using ::mediapipe::formats::MatView;
 using ::mediapipe::ImageFormat;
+using ::mediapipe::NormalizedRect;
 using NormalizedRects = std::vector<NormalizedRect>;
 using Size = std::pair<int, int>;
 

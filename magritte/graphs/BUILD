@@ -45,6 +45,17 @@ magritte_graph(
 )
 
 magritte_graph(
+    name = "face_tracking_overlay_offline_cpu",
+    graph = "face_tracking_overlay_offline_cpu.pbtxt",
+    register_as = "FaceTrackingOverlayOfflineCpu",
+    deps = [
+        "//magritte/graphs/detection:face_detection_short_and_full_range_cpu",
+        "//magritte/graphs/redaction:detection_tracking_overlay_cpu",
+        "//magritte/graphs/tracking:tracking_cpu",
+    ],
+)
+
+magritte_graph(
     name = "face_blur_with_tracking_offline_cpu",
     graph = "face_blur_with_tracking_offline_cpu.pbtxt",
     register_as = "FaceBlurWithTrackingOfflineCpu",
@@ -85,6 +96,18 @@ magritte_graph(
     deps = [
         "//magritte/graphs/detection:face_detection_full_range_gpu",
         "//magritte/graphs/redaction:face_detection_overlay_gpu",
+        "@mediapipe//mediapipe/calculators/core:flow_limiter_calculator",
+    ],
+)
+
+magritte_graph(
+    name = "face_tracking_overlay_live_gpu",
+    graph = "face_tracking_overlay_live_gpu.pbtxt",
+    register_as = "FaceTrackingOverlayLiveGpu",
+    deps = [
+        "//magritte/graphs/detection:face_detection_full_range_gpu",
+        "//magritte/graphs/redaction:detection_tracking_overlay_gpu",
+        "//magritte/graphs/tracking:tracking_gpu",
         "@mediapipe//mediapipe/calculators/core:flow_limiter_calculator",
     ],
 )

@@ -345,6 +345,89 @@ files in the test_data directory.
 
 **Code:** [source code](https://github.com/google/magritte/blob/master/magritte/graphs/face_sticker_redaction_offline_cpu.pbtxt)
 
+#### FaceTrackingOverlayLiveGpu
+
+A graph that detects and tracks faces to draw debug information.
+
+It draws in red the raw detection output (detection box, keypoints, score),
+and in blue the tracked detection output (detection box, keypoints, score,
+when present).
+
+This graph is specialized for GPU architectures. It also optimized for live
+streaming environments by throttling the input stream and by applying only
+full-range face detection.
+
+**Input streams:**
+
+*   `input_video`: A GpuBuffer stream containing the image on which detection
+  models are run.
+
+**Output streams:**
+
+*   `output_video`: A GpuBuffer stream containing the image annotated with
+  detections data.
+
+**Build targets:**
+
+*   Graph `cc_library`:
+
+    ```
+    @magritte//magritte/graphs:face_tracking_overlay_live_gpu
+    ```
+*   Text proto file:
+
+    ```
+    @magritte//magritte/graphs:face_tracking_overlay_live_gpu.pbtxt
+    ```
+*   Binary graph:
+
+    ```
+    @magritte//magritte/graphs:face_tracking_overlay_live_gpu_graph
+    ```
+
+**Code:** [source code](https://github.com/google/magritte/blob/master/magritte/graphs/face_tracking_overlay_live_gpu.pbtxt)
+
+#### FaceTrackingOverlayOfflineCpu
+
+A graph that detects and tracks faces to draw debug information.
+
+It draws in red the raw detection output (detection box, keypoints, score),
+and in blue the tracked detection output (detection box, keypoints, score,
+when present).
+
+This graph is specialized for CPU architectures and offline environments
+(no throttling is applied).
+
+**Input streams:**
+
+*   `input_video`: An ImageFrame stream containing the image on which detection
+  models are run.
+
+**Output streams:**
+
+*   `output_video`: An ImageFrame stream containing the image annotated with
+  detections data.
+
+**Build targets:**
+
+*   Graph `cc_library`:
+
+    ```
+    @magritte//magritte/graphs:face_tracking_overlay_offline_cpu
+    ```
+*   Text proto file:
+
+    ```
+    @magritte//magritte/graphs:face_tracking_overlay_offline_cpu.pbtxt
+    ```
+*   Binary graph:
+
+    ```
+    @magritte//magritte/graphs:face_tracking_overlay_offline_cpu_graph
+    ```
+
+**Code:** [source code](https://github.com/google/magritte/blob/master/magritte/graphs/face_tracking_overlay_offline_cpu.pbtxt)
+
 ## Subgraphs
 
 ### Detection
@@ -878,6 +961,78 @@ the ovals will be white.
     ```
 
 **Code:** [source code](https://github.com/google/magritte/blob/master/magritte/graphs/redaction/detection_to_mask/face_detection_to_mask_gpu.pbtxt)
+
+#### DetectionTrackingOverlaySubgraphCpu
+
+Subgraph to draw debug information at the locations specified by two incoming
+detection streams. For each detection stream, it will draw all data available
+from detections, including the bounding box, keypoints and score.
+
+**Input streams:**
+
+*   `IMAGE`: An ImageFrame containing the image to draw the overlays on.
+*   `[0]`: A std::vector<mediapipe::Detection>, will be rendered in red.
+*   `[1]`: A std::vector<mediapipe::Detection>, will be rendered in blue.
+
+**Output streams:**
+
+*   `IMAGE`: The resulting image.
+
+**Build targets:**
+
+*   Graph `cc_library`:
+
+    ```
+    @magritte//magritte/graphs/redaction:detection_tracking_overlay_cpu
+    ```
+*   Text proto file:
+
+    ```
+    @magritte//magritte/graphs/redaction:detection_tracking_overlay_cpu.pbtxt
+    ```
+*   Binary graph:
+
+    ```
+    @magritte//magritte/graphs/redaction:detection_tracking_overlay_cpu_graph
+    ```
+
+**Code:** [source code](https://github.com/google/magritte/blob/master/magritte/graphs/redaction/detection_tracking_overlay_cpu.pbtxt)
+
+#### DetectionTrackingOverlaySubgraphGpu
+
+Subgraph to draw debug information at the locations specified by two incoming
+detection streams. For each detection stream, it will draw all data available
+from detections, including the bounding box, keypoints and score.
+
+**Input streams:**
+
+*   `IMAGE_GPU`: A GpuBuffer containing the image to draw the overlays on.
+*   `[0]`: A std::vector<mediapipe::Detection>, will be rendered in red.
+*   `[1]`: A std::vector<mediapipe::Detection>, will be rendered in blue.
+
+**Output streams:**
+
+*   `IMAGE_GPU`: The resulting image.
+
+**Build targets:**
+
+*   Graph `cc_library`:
+
+    ```
+    @magritte//magritte/graphs/redaction:detection_tracking_overlay_gpu
+    ```
+*   Text proto file:
+
+    ```
+    @magritte//magritte/graphs/redaction:detection_tracking_overlay_gpu.pbtxt
+    ```
+*   Binary graph:
+
+    ```
+    @magritte//magritte/graphs/redaction:detection_tracking_overlay_gpu_graph
+    ```
+
+**Code:** [source code](https://github.com/google/magritte/blob/master/magritte/graphs/redaction/detection_tracking_overlay_gpu.pbtxt)
 
 #### FaceDetectionOverlaySubgraphCpu
 
