@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Added
+
+## [1.0.1]
+
+### Added
 - Overlay graphs to display both base detection and tracked detections.
 
 ### Changed
