@@ -50,6 +50,7 @@ _top_level_graph_targets = [
     "//magritte/graphs:face_blur_with_tracking_live_cpu",
     "//magritte/graphs:face_blur_with_tracking_offline_cpu",
     "//magritte/graphs:face_overlay_offline_cpu",
+    "//magritte/graphs:face_tracking_overlay_offline_cpu",
     "//magritte/graphs:face_pixelization_offline_cpu",
     "//magritte/graphs:face_sticker_redaction_offline_cpu",
 ] + select({

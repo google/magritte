@@ -72,6 +72,26 @@ magritte_graph(
 )
 
 magritte_graph(
+    name = "detection_tracking_overlay_cpu",
+    graph = "detection_tracking_overlay_cpu.pbtxt",
+    register_as = "DetectionTrackingOverlaySubgraphCpu",
+    deps = [
+        "@mediapipe//mediapipe/calculators/util:annotation_overlay_calculator",
+        "@mediapipe//mediapipe/calculators/util:detections_to_render_data_calculator",
+    ],
+)
+
+magritte_graph(
+    name = "detection_tracking_overlay_gpu",
+    graph = "detection_tracking_overlay_gpu.pbtxt",
+    register_as = "DetectionTrackingOverlaySubgraphGpu",
+    deps = [
+        "@mediapipe//mediapipe/calculators/util:annotation_overlay_calculator",
+        "@mediapipe//mediapipe/calculators/util:detections_to_render_data_calculator",
+    ],
+)
+
+magritte_graph(
     name = "face_sticker_redaction_cpu",
     data = ["//magritte/test_data:emoji.png"],
     graph = "face_sticker_redaction_cpu.pbtxt",

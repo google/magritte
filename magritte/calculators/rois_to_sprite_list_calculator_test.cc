@@ -44,10 +44,10 @@ using ::mediapipe::CalculatorGraphConfig;
 using ::mediapipe::CalculatorRunner;
 using ::mediapipe::ImageFormat;
 using ::mediapipe::ImageFrame;
-using ::mediapipe::NormalizedRect;
 using ::mediapipe::Packet;
 using ::mediapipe::Timestamp;
 using ::mediapipe::formats::MatView;
+using ::mediapipe::NormalizedRect;
 using SizeFloat = std::pair<float, float>;
 using SizeInt = std::pair<int, int>;
 

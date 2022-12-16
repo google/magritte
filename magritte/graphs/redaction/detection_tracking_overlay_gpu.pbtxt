@@ -1,0 +1,70 @@
+#
+# Copyright 2019-2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+package: "magritte"
+type: "DetectionTrackingOverlaySubgraphGpu"
+
+# Subgraph to draw debug information at the locations specified by two incoming
+# detection streams. For each detection stream, it will draw all data available
+# from detections, including the bounding box, keypoints and score.
+#
+# Inputs:
+# - IMAGE_GPU: A GpuBuffer containing the image to draw the overlays on.
+# - A std::vector<mediapipe::Detection>, will be rendered in red.
+# - A std::vector<mediapipe::Detection>, will be rendered in blue.
+#
+# Outputs:
+# - IMAGE_GPU: The resulting image.
+input_stream: "IMAGE_GPU:input_video"
+input_stream: "output_detections"
+input_stream: "tracked_detections"
+output_stream: "IMAGE_GPU:output_video"
+
+# Converts the detections to drawing primitives for annotation overlay.
+node {
+  calculator: "DetectionsToRenderDataCalculator"
+  input_stream: "DETECTIONS:output_detections"
+  output_stream: "RENDER_DATA:detections_render_data"
+  node_options: {
+    [type.googleapis.com/mediapipe.DetectionsToRenderDataCalculatorOptions] {
+      thickness: 4.0
+      color { r: 255 g: 0 b: 0 }
+      render_detection_id: true
+    }
+  }
+}
+
+# Converts the detections to drawing primitives for annotation overlay.
+node {
+  calculator: "DetectionsToRenderDataCalculator"
+  input_stream: "DETECTIONS:tracked_detections"
+  output_stream: "RENDER_DATA:tracked_detections_render_data"
+  node_options: {
+    [type.googleapis.com/mediapipe.DetectionsToRenderDataCalculatorOptions] {
+      thickness: 4.0
+      color { r: 0 g: 0 b: 255 }
+      render_detection_id: true
+    }
+  }
+}
+
+# Draws annotations and overlays them on top of the input images.
+node {
+  calculator: "AnnotationOverlayCalculator"
+  input_stream: "IMAGE_GPU:input_video"
+  input_stream: "detections_render_data"
+  input_stream: "tracked_detections_render_data"
+  output_stream: "IMAGE_GPU:output_video"
+}

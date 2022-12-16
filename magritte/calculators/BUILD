@@ -111,7 +111,6 @@ mediapipe_proto_library(
 cc_library(
     name = "pixelization_calculator_gpu",
     srcs = ["pixelization_calculator_gpu.cc"],
-    visibility = ["//visibility:public"],
     deps = [
         ":pixelization_calculator_cc_proto",
         "@mediapipe//mediapipe/framework:calculator_framework",
@@ -154,7 +153,6 @@ cc_library(
     name = "blend_calculator",
     srcs = ["blend_calculator.cc"],
     hdrs = ["blend_calculator.h"],
-    visibility = ["//visibility:public"],
     deps = [
         "@mediapipe//mediapipe/framework:calculator_framework",
         "@mediapipe//mediapipe/framework/formats:image_frame",

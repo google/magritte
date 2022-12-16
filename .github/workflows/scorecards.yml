@@ -34,9 +34,6 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
-          # Read-only PAT token. Necessary for the Branch-Protection check.
-          # On creating/modifying the PAT token, see https://github.com/ossf/scorecard-action#authentication-with-pat.
-          repo_token: ${{ secrets.SCORECARD_READ_TOKEN }}
 
           # Publish the results for public repositories to enable scorecard badges. For more details, see
           # https://github.com/ossf/scorecard-action#publishing-results.

@@ -9,6 +9,11 @@ nav_order: 4
 This document contains a summary of all changes to the Magritte open-source
 library.
 
+## 1.0.1
+
+*   Add overlay graphs to display both base detection and tracked detections.
+*   Replace absl::make_unique with std::make_unique (introduced in C++14).
+
 ## 1.0.0
 
 *   First release to GitHub.
