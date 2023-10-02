@@ -1,0 +1,99 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+#
+# ******** NOTE ********
+# We have attempted to detect the languages in your repository. Please check
+# the `language` matrix defined below to confirm you have the correct set of
+# supported CodeQL languages.
+#
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+  schedule:
+    - cron: '36 0 * * 5'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp', 'java' ]
+        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
+        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        # If you wish to specify custom queries, you can do so here or in a config file.
+        # By default, queries listed here will override any specified in a config file.
+        # Prefix the list here with "+" to use these queries and those in the config file.
+        
+        # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
+        # queries: security-extended,security-and-quality
+
+        
+    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+    # If this step fails, then you should remove it and run the build manually (see below)
+    # Disable Autobuild as the repository has build CIs.
+    # - name: Autobuild
+    #  uses: github/codeql-action/autobuild@v2
+
+    # ℹ️ Command-line programs to run using the OS shell.
+    # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+
+    #   If the Autobuild fails above, remove it and uncomment the following three lines. 
+    #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
+
+    - name: Build Application using Bazel
+      run: |
+        echo "Run, Build Application using Bazel"
+        # Before building, remove cached objects and stop all running Bazel server processes.
+        bazel clean --expunge
+        
+        wget https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
+        tar -xvzf ./codeql-bundle-linux64.tar.gz
+        export PATH="$PATH:$(pwd)/codeql"
+        sudo apt-get install -y python3-numpy libopencv-core-dev libopencv-highgui-dev \
+          libopencv-calib3d-dev libopencv-features2d-dev \
+          libopencv-imgproc-dev libopencv-video-dev libopencv-contrib-dev \
+          mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
+        sed -i '/include\/opencv4/s/#//g' third_party/opencv_linux.BUILD
+
+        # Build using the following Bazel flags, to help CodeQL detect the build:
+        # `--spawn_strategy=local`: build locally, instead of using a distributed build
+        # `--nouse_action_cache`: turn off build caching, which might prevent recompilation of source code
+        # `--noremote_accept_cached`, `--noremote_upload_local_results`: avoid using a remote cache
+        codeql database create cpp-database --language=cpp \
+          --command="bazel build --cxxopt=-std=c++17 --experimental_repo_remote_exec --spawn_strategy=local --nouse_action_cache --noremote_accept_cached --noremote_upload_local_results -- //magritte:all //magritte/graphs/... //magritte/calculators/... //magritte/api/... //magritte/examples/... -//magritte/examples/android/..."
+
+        codeql database create java-database --language=java \
+          --command="bazel build --cxxopt=-std=c++17 --experimental_repo_remote_exec --define EXCLUDE_OPENCV_SO_LIB=1 //magritte/examples/android/demo/java:magritte_demo"
+
+        # After building, stop all running Bazel server processes.
+        # This ensures future build commands start in a clean Bazel server process
+        # without CodeQL attached.
+        bazel shutdown
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
