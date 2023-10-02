@@ -161,16 +161,21 @@ def _copy_action_bash(ctx, input_file, output_file):
 # Copies a file to another file. If the destination directory does not exist
 # it will be created. (Windows version)
 def _copy_action_windows(ctx, input_file, output_file):
+    bat = ctx.actions.declare_file("%s-%s-cmd.bat" % (ctx.label.name, hash(src.path)))
     file_to_copy = input_file.path.replace("/", "\\")
     destination_folder = output_file.dirname.replace("/", "\\")
-    cmd_part1 = "(if not exist \"%s\" mkdir \"%s\")" % (destination_folder, destination_folder)
-    cmd_part2 = " && @copy /Y \"%s\" \"%s\"" % (file_to_copy, destination_folder)
-    cmd = cmd_part1 + cmd_part2
+    ctx.actions.write(
+        output = bat,
+        content = "@mkdir \"%s\"\n@copy /Y \"%s\" \"%s\"" %
+                  (destination_folder, file_to_copy, destination_folder),
+        is_executable = True,
+    )
     ctx.actions.run(
         inputs = [input_file],
+        tools = [bat],
         outputs = [output_file],
         executable = "cmd.exe",
-        arguments = ["/C", cmd],
+        arguments = ["/C", bat.path.replace("/", "\\")],
         use_default_shell_env = True,
     )
 
